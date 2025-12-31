@@ -1,0 +1,16 @@
+[project]
+name = "brain-tumor-classification"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.120.3",
+    "pillow>=12.0.0",
+    "python-multipart>=0.0.20",
+    "tensorflow>=2.20.0",
+    "uvicorn[standard]>=0.38.0",
+]
+
+[tool.uv]
+# Add this to include current directory in Python path
