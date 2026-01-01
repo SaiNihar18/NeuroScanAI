@@ -133,21 +133,21 @@ export const UploadSection = () => {
               {!preview ? (
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all ${
+                  className={`border-2 border-dashed rounded-xl p-8 md:p-12 text-center cursor-pointer transition-all touch-none ${
                     isDragActive
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-primary/50'
                   }`}
                 >
                   <input {...getInputProps()} />
-                  <Upload className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-lg font-medium mb-2">
-                    {isDragActive ? 'Drop the image here' : 'Drag & drop an MRI image'}
+                  <Upload className="h-12 md:h-16 w-12 md:w-16 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-base md:text-lg font-medium mb-2">
+                    {isDragActive ? 'Drop the image here' : 'Upload an MRI image'}
                   </p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    or click to select a file
+                  <p className="text-xs md:text-sm text-muted-foreground mb-4">
+                    Tap to select or drag & drop
                   </p>
-                  <Button variant="outline">Browse Files</Button>
+                  <Button variant="outline" size="lg">Browse Files</Button>
                 </div>
               ) : (
                 <div className="space-y-4">
