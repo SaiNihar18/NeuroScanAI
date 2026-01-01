@@ -8,21 +8,23 @@ The project follows an end-to-end workflow, covering dataset preparation, model 
 
 ---
 
-## 🏗️ Project Structure
+## 📂 Project Structure
 
+```text
 NeuroScanAI/
-├── frontend/        # React + TypeScript frontend (Vercel)
-├── backend/         # FastAPI backend service
+├── frontend/        # React frontend (Vercel)
+├── backend/         # FastAPI backend
 │   └── app/
-│       ├── main.py            # API entrypoint
-│       ├── predict.py         # Inference logic
-│       └── model_loader.py    # Model loading utilities
-├── ml/              # Machine learning assets
-│   └── model/       # Trained model & class mappings
-├── scripts/         # Helper and automation scripts
-├── tests/           # API and model tests
-└── README.md
-
+│       ├── main.py
+│       ├── predict.py
+│       └── model_loader.py
+├── ml/
+│   └── model/       # Model configs (weights excluded)
+├── scripts/         # Utility scripts
+├── tests/           # Test files
+├── README.md
+└── .gitignore
+```
 ---
 
 ## 🎯 Objectives
