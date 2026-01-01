@@ -1,149 +1,101 @@
-# Brain Tumor Classification App
+🧠 Brain Tumor Classification using Deep Learning
 
-A full-stack web application for detecting brain tumors using machine learning.
+Xception + Transfer Learning
 
-## Project Structure
+📘 Overview
 
-```
-.
-├── app/                 # Backend API (FastAPI)
-├── frontend/            # Frontend (React + TypeScript + Vite)
-├── model/               # ML Model files
-├── tools/               # Utility scripts
-├── start-dev.py         # Development startup script
-├── build.py             # Production build script
-└── requirements.txt     # Python dependencies
-```
+This project focuses on the classification of brain MRI scans into four clinically relevant categories — Glioma, Meningioma, Pituitary Tumor, and No Tumor — using a deep learning approach built with TensorFlow and Keras.
 
-## Development Setup
+The model is developed using transfer learning with the Xception architecture, pre-trained on ImageNet, allowing the system to achieve strong performance while reducing training time and overfitting.
+The work combines model development, evaluation, and deployment considerations, making it suitable both for academic study and real-world application.
 
-### Prerequisites
+🎯 Objectives
 
-- Python 3.13+
-- Node.js and npm (for frontend)
-- uv (Python package manager)
+Design and train a deep learning model for multi-class brain tumor classification from MRI images.
 
-### Installation
+Leverage transfer learning (Xception) to improve feature extraction and convergence.
 
-1. Install Python dependencies:
-```bash
-uv sync
-```
+Apply data preprocessing and augmentation to enhance generalization.
 
-2. Install frontend dependencies:
-```bash
-cd frontend
-npm install
-```
+Evaluate model performance using classification metrics and visual analysis.
 
-### Running in Development Mode
+Support single-image inference for practical usage.
 
-```bash
-python start-dev.py
-```
+Prepare trained models in formats suitable for web-based deployment and future research.
 
-This will start both:
-- Backend API on http://localhost:8000
-- Frontend on http://localhost:8080
+📁 Dataset
 
-## Production Deployment
+The project uses the Brain Tumor MRI Dataset available on Kaggle:
 
-### Building for Production
+🔗 Dataset link:
+Brain Tumor MRI Dataset – Kaggle
 
-```bash
-python build.py
-```
+Dataset Structure
 
-This will:
-1. Build the React frontend
-2. Copy the built files to the backend static directory
-3. Configure the backend to serve the frontend
+The dataset is organized into:
 
-### Running in Production
+Training set: Training/
 
-```bash
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
+Testing set: Testing/
 
-The application will be available at http://your-server-ip:8000
+Each split contains four classes:
 
-## API Endpoints
+glioma/
 
-- `GET /` - Health check endpoint
-- `POST /predict` - Upload an image for tumor classification
+meningioma/
 
-## Deployment Options
+pituitary/
 
-### Option 1: Traditional Server Deployment
+notumor/
 
-1. Clone the repository to your server
-2. Install dependencies:
-   ```bash
-   uv sync
-   cd frontend && npm install && cd ..
-   ```
-3. Build the application:
-   ```bash
-   python build.py
-   ```
-4. Run the server:
-   ```bash
-   python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
-   ```
+All images are MRI scans captured under varying conditions, making the classification task non-trivial and well-suited for deep learning techniques.
 
-### Option 2: Docker Deployment (Recommended)
+🧩 Model Architecture
+🔹 Base Model
 
-Build and run:
-```bash
-docker build -t brain-tumor-app .
-docker run -p 8000:8000 brain-tumor-app
-```
+Xception (pre-trained on ImageNet)
+Used as the backbone for feature extraction with convolutional layers initially frozen to preserve learned representations.
 
-### Option 3: Cloud Platforms
+🔹 Custom Classification Head
+Layer	Purpose
+Flatten	Converts convolutional features into a 1D vector
+Dropout (0.30, 0.25)	Reduces overfitting
+Dense (128, ReLU)	Learns task-specific features
+Dense (4, Softmax)	Outputs class probabilities
+🔹 Training Configuration
 
-#### Heroku
-1. Create a `Procfile`:
-   ```
-   web: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
-   ```
+Optimizer: Adamax (learning rate = 0.001)
 
-2. Create a `runtime.txt`:
-   ```
-   python-3.13
-   ```
+Loss Function: Categorical Crossentropy
 
-3. Deploy using Heroku CLI:
-   ```bash
-   heroku create
-   git push heroku main
-   ```
+Evaluation Metrics: Accuracy, Precision, Recall
 
-#### Render
-1. Create a `render.yaml`:
-   ```yaml
-   services:
-     - type: web
-       name: brain-tumor-classification
-       env: python
-       buildCommand: "pip install -r requirements.txt && cd frontend && npm install && cd .. && python build.py"
-       startCommand: "python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT"
-   ```
+This setup balances training stability with generalization performance.
 
-#### Vercel (Frontend only)
-For hosting just the frontend on Vercel:
-1. Set up environment variables in Vercel dashboard:
-   - `VITE_API_BASE_URL` pointing to your backend URL
+⚙️ System Requirements
+📦 Dependencies
 
-2. Configure build settings:
-   - Build Command: `cd frontend && npm install && npm run build`
-   - Output Directory: `frontend/dist`
+All required dependencies can be installed using:
 
-Note: You'll need to deploy the backend separately on a platform that supports Python.
+pip install tensorflow keras pillow numpy pandas matplotlib seaborn tqdm scikit-learn
 
-## Environment Variables
+🧪 Model Output
 
-### Frontend
-- `VITE_API_BASE_URL` - Backend API URL (default: http://localhost:8000)
+The trained model produces a probability distribution across the four tumor classes, enabling both classification and confidence estimation for each prediction.
 
-### Backend
-No special environment variables required for basic operation.
+🚀 Deployment Notes
+
+The trained model has been adapted for web-based inference, enabling real-time predictions through a backend API and a browser-based frontend.
+Large model files are intentionally excluded from this repository to keep the codebase lightweight and version-controlled.
+
+A live demo and API documentation are available via hosted services.
+
+📌 Use Cases
+
+Academic research and experimentation
+
+Medical imaging AI demonstrations
+
+Educational projects in deep learning and computer vision
+
+Prototype systems for clinical decision support (non-diagnostic)
