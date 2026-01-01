@@ -43,3 +43,9 @@ __pycache__/
 model/*.h5
 model/*.keras
 model/*.tflite
+
+# Trained ML models (do not commit)
+*.h5
+*.keras
+ml/model/*.h5
+ml/model/*.keras

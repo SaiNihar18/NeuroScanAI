@@ -7,8 +7,11 @@ print("🔄 Recreating EXACT model architecture from training code...")
 print("📁 Checking model file exists...")
 
 # Verify model file exists and get size
-MODEL_PATH = os.path.join("model", "brain_tumor_model.keras")
-CLASS_INDEX_PATH = os.path.join("model", "tumor_class_indices.json")
+# Get the parent directory of backend (which is the project root)
+BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+MODEL_PATH = os.path.join(PROJECT_ROOT, "ml", "model", "brain_tumor_model.keras")
+CLASS_INDEX_PATH = os.path.join(PROJECT_ROOT, "ml", "model", "tumor_class_indices.json")
 
 if not os.path.exists(MODEL_PATH):
     raise FileNotFoundError("❌ brain_tumor_model.keras NOT FOUND! Put it in model/ folder.")
