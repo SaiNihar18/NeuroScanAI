@@ -1,7 +1,7 @@
 [project]
 name = "brain-tumor-classification"
 version = "0.1.0"
-description = "Add your description here"
+description = "Advanced brain tumor classification using deep learning with Xception transfer learning model. Web-based MRI analysis for AI-powered medical imaging."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
