@@ -8,6 +8,25 @@ The project follows an end-to-end workflow, covering dataset preparation, model 
 
 ---
 
+## 📂 Project Structure
+
+```text
+NeuroScanAI/
+├── frontend/        # React frontend (Vercel)
+├── backend/         # FastAPI backend
+│   └── app/
+│       ├── main.py
+│       ├── predict.py
+│       └── model_loader.py
+├── ml/
+│   └── model/       # Model configs (weights excluded)
+├── scripts/         # Utility scripts
+├── tests/           # Test files
+├── README.md
+└── .gitignore
+```
+---
+
 ## 🎯 Objectives
 - Develop a **deep learning model** to classify brain MRI images into multiple tumor categories.
 - Apply **transfer learning (Xception)** to improve model performance and training efficiency.
@@ -89,6 +108,18 @@ Large trained model files are intentionally excluded from this repository to kee
 - Medical imaging AI demonstrations
 - Educational projects in deep learning and computer vision
 - Prototype systems for clinical decision support (non-diagnostic use)
+
+---
+
+## 🚀 Deployment Overview
+
+The project is deployed using a decoupled architecture:
+
+- **Frontend** is deployed on **Vercel**, providing a responsive web interface for uploading MRI images and viewing predictions.
+- **Backend API** is deployed on **Hugging Face Spaces** using **FastAPI**, handling image preprocessing and model inference.
+- The trained deep learning model is loaded once at startup to ensure efficient inference.
+
+This setup allows independent scaling and clean separation between UI, API, and machine learning components.
 
 ---
 
