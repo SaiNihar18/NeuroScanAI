@@ -7,6 +7,13 @@ from .model_loader import model, CLASS_NAMES
 IMG_SIZE = (299, 299)
 
 def predict_image(image_file: UploadFile) -> dict:
+    # Check if model is available
+    if model is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Model is not available. Please ensure TensorFlow is installed and restart the server."
+        )
+    
     # ✅ Check MIME type
     if not image_file.content_type or not image_file.content_type.startswith('image/'):
         raise HTTPException(
