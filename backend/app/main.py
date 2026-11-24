@@ -1,52 +1,73 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 import os
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from .model_loader import model_status, warm_up
 from .predict import predict_image
 
-app = FastAPI(title="Brain Tumor Classification API")
 
-# Configure CORS for development
-origins = [
-    "http://localhost:8080",  # Vite dev server
-    "http://127.0.0.1:8080",  # Alternative localhost
-    "http://localhost:8081",  # Vite dev server (alternative port)
-    "http://127.0.0.1:8081",  # Alternative localhost
-    "http://localhost:8082",  # Vite dev server (alternative port)
-    "http://127.0.0.1:8082",  # Alternative localhost
-    "http://localhost:8083",  # Vite dev server (alternative port)
-    "http://127.0.0.1:8083",  # Alternative localhost
-    "http://localhost:8084",  # Vite dev server (alternative port)
-    "http://127.0.0.1:8084",  # Alternative localhost
-    "http://localhost:8085",  # Vite dev server (alternative port)
-    "http://127.0.0.1:8085",  # Alternative localhost
-    "http://localhost:5173",  # Default Vite port
-    "http://127.0.0.1:5173",  # Alternative default Vite port
-]
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # Run one dummy inference so the first real request is fast.
+    warm_up()
+    yield
 
+
+app = FastAPI(title="Brain Tumor Classification API", lifespan=lifespan)
+
+# Allowed origins: any localhost port (dev) plus anything listed in CORS_ORIGINS
+# (comma separated), e.g. CORS_ORIGINS=https://my-site.example
+extra_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=extra_origins,
+    allow_origin_regex=r"^http://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# API routes (defined before static files to avoid conflicts)
-@app.get("/")
-def root():
-    return {"message": "Brain Tumor Classification API is running!"}
 
+# ---- API routes (registered before the static mount) ----
+@app.get("/api/health")
+def health():
+    return {"message": "Brain Tumor Classification API is running!", **model_status()}
+
+
+# Plain `def` so FastAPI runs the CPU-bound inference in a worker thread
+# instead of blocking the event loop.
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
-    result = predict_image(file)
-    return result
+def predict(file: UploadFile = File(...)):
+    return predict_image(file)
 
-# Serve frontend static files in production (mount after API routes)
+
+# ---- Frontend (production build) ----
 static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(static_dir):
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+index_file = os.path.join(static_dir, "index.html")
+
+if os.path.exists(index_file):
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def spa(full_path: str):
+        """Serve real files from the build, otherwise the SPA shell (client-side routing)."""
+        if full_path.startswith(("api/", "predict")):
+            raise HTTPException(status_code=404)
+        candidate = os.path.realpath(os.path.join(static_dir, full_path))
+        if full_path and candidate.startswith(os.path.realpath(static_dir)) and os.path.isfile(candidate):
+            return FileResponse(candidate)
+        return FileResponse(index_file)
+else:
+    @app.get("/")
+    def root():
+        return {"message": "Brain Tumor Classification API is running!"}
+
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

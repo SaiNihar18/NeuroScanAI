@@ -1,54 +1,82 @@
 import axios from 'axios';
 import { PredictionResult } from '@/types/prediction';
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+// Empty string = same origin (FastAPI serving the built frontend).
+// VITE_API_BASE_URL is accepted as a legacy alias.
+const API_BASE = ((import.meta.env.VITE_API_BASE ?? import.meta.env.VITE_API_BASE_URL ?? '') as string).replace(
+  /\/+$/,
+  '',
+);
 
-// Backend response type
 interface PredictApiResponse {
   predicted_class: string;
   confidence: number;
-  probabilities: number[];
+  probabilities?: Record<string, number>;
+  /** Older backend versions */
+  all_probs?: number[];
+  classes?: string[];
+  predict_time_ms?: number;
 }
 
-export const predictTumor = async (imageFile: File): Promise<PredictionResult> => {
+export interface PredictOptions {
+  signal?: AbortSignal;
+  /** Called with 0..1 while the file is uploading */
+  onUploadProgress?: (fraction: number) => void;
+}
+
+export class AnalysisCancelled extends Error {
+  constructor() {
+    super('Analysis cancelled');
+    this.name = 'AnalysisCancelled';
+  }
+}
+
+const toProbabilities = (data: PredictApiResponse): Record<string, number> => {
+  if (data.probabilities) return data.probabilities;
+  const { all_probs, classes } = data;
+  if (all_probs && classes) {
+    return Object.fromEntries(classes.map((c, i) => [c, all_probs[i]]));
+  }
+  return { [data.predicted_class]: data.confidence };
+};
+
+export const predictTumor = async (
+  imageFile: File,
+  { signal, onUploadProgress }: PredictOptions = {},
+): Promise<PredictionResult> => {
   const formData = new FormData();
   formData.append('file', imageFile);
-
-  const startTime = performance.now();
+  const start = performance.now();
 
   try {
-    console.log('API_BASE:', API_BASE);
-    console.log('Making request to:', `${API_BASE}/predict`);
-    
-    const response = await axios.post<PredictApiResponse>(
-      `${API_BASE}/predict`,
-      formData
-    );
-
-    const endTime = performance.now();
-    const inferenceTime = (endTime - startTime) / 1000;
-
-    console.log('API Response:', response.data);
+    const { data } = await axios.post<PredictApiResponse>(`${API_BASE}/predict`, formData, {
+      signal,
+      timeout: 120_000,
+      onUploadProgress: (e) => {
+        if (e.total) onUploadProgress?.(e.loaded / e.total);
+      },
+    });
 
     return {
-      class: response.data.predicted_class,
-      confidence: response.data.confidence,
-      inferenceTimeSec: inferenceTime,
+      predictedClass: data.predicted_class,
+      confidence: data.confidence,
+      probabilities: toProbabilities(data),
+      inferenceMs: data.predict_time_ms,
+      roundTripSec: (performance.now() - start) / 1000,
       timestamp: Date.now(),
     };
   } catch (error) {
-    console.error('API Error:', error);
+    if (axios.isCancel(error)) throw new AnalysisCancelled();
 
     if (axios.isAxiosError(error)) {
-      console.error('Response status:', error.response?.status);
-      console.error('Response data:', error.response?.data);
-      throw new Error(
-        error.response?.data?.detail ||
-        error.message ||
-        'Failed to analyze image. Please try again.'
-      );
+      const detail = error.response?.data?.detail;
+      if (typeof detail === 'string') throw new Error(detail);
+      if (error.code === 'ECONNABORTED') throw new Error('The analysis timed out. Please try again.');
+      if (!error.response) {
+        throw new Error('Cannot reach the analysis server. Check your connection and try again.');
+      }
+      throw new Error(`The server returned an error (${error.response.status}). Please try again.`);
     }
-
     throw new Error('An unexpected error occurred. Please try again.');
   }
 };

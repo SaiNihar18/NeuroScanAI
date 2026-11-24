@@ -2,105 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
+/* Design tokens. All colors are HSL triplets consumed via hsl(var(--token)). */
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 47.4% 11.2%;
+    --background: 210 33% 98%;
+    --foreground: 222 40% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
+    --card-foreground: 222 40% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 222 40% 12%;
 
-    --primary: 200 95% 45%;
+    /* Clinical teal-blue: the single brand color */
+    --primary: 199 89% 36%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 30% 95%;
+    --secondary-foreground: 222 40% 16%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 30% 95%;
+    --muted-foreground: 215 16% 40%;
 
-    --accent: 270 80% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 199 60% 94%;
+    --accent-foreground: 199 89% 26%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 200 95% 45%;
+    --success: 152 62% 31%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 38%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 214 25% 90%;
+    --input: 214 25% 88%;
+    --ring: 199 89% 36%;
 
     --radius: 0.75rem;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(200, 95%, 45%), hsl(270, 80%, 60%));
-    --gradient-hero: linear-gradient(135deg, hsl(200, 95%, 45%) 0%, hsl(220, 90%, 56%) 50%, hsl(270, 80%, 60%) 100%);
-    --shadow-glow: 0 0 40px hsl(200 95% 45% / 0.3);
-    --shadow-card: 0 4px 20px hsl(222.2 47.4% 11.2% / 0.08);
 
-    --sidebar-background: 0 0% 98%;
+    /* Per-class colors used in result charts */
+    --class-glioma: 199 89% 36%;
+    --class-meningioma: 262 52% 52%;
+    --class-pituitary: 28 88% 46%;
+    --class-notumor: 152 62% 31%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --shadow-card: 0 1px 2px hsl(222 40% 12% / 0.04), 0 4px 16px hsl(222 40% 12% / 0.05);
+    --shadow-elevated: 0 2px 4px hsl(222 40% 12% / 0.05), 0 12px 32px hsl(222 40% 12% / 0.08);
   }
 
   .dark {
-    --background: 222.2 84% 6%;
-    --foreground: 210 40% 98%;
+    --background: 222 36% 7%;
+    --foreground: 210 30% 96%;
 
-    --card: 222.2 47.4% 10%;
-    --card-foreground: 210 40% 98%;
+    --card: 222 32% 10%;
+    --card-foreground: 210 30% 96%;
 
-    --popover: 222.2 47.4% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 222 32% 10%;
+    --popover-foreground: 210 30% 96%;
 
-    --primary: 200 95% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 199 90% 52%;
+    --primary-foreground: 222 40% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 24% 15%;
+    --secondary-foreground: 210 30% 96%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 24% 15%;
+    --muted-foreground: 215 18% 68%;
 
-    --accent: 270 80% 65%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 199 40% 17%;
+    --accent-foreground: 199 90% 74%;
 
-    --destructive: 0 62.8% 50.6%;
+    --destructive: 0 70% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 200 95% 50%;
-    
-    --gradient-primary: linear-gradient(135deg, hsl(200, 95%, 50%), hsl(270, 80%, 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(200, 95%, 50%) 0%, hsl(220, 90%, 60%) 50%, hsl(270, 80%, 65%) 100%);
-    --shadow-glow: 0 0 40px hsl(200 95% 50% / 0.4);
-    --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.3);
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --success: 152 55% 50%;
+    --success-foreground: 222 40% 8%;
+    --warning: 38 92% 56%;
+    --warning-foreground: 222 40% 8%;
+
+    --border: 220 22% 18%;
+    --input: 220 22% 20%;
+    --ring: 199 90% 52%;
+
+    --class-glioma: 199 90% 58%;
+    --class-meningioma: 262 70% 72%;
+    --class-pituitary: 30 92% 62%;
+    --class-notumor: 152 55% 52%;
+
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 12px 32px hsl(0 0% 0% / 0.4);
   }
 }
 
@@ -109,7 +100,73 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1, h2, h3 {
+    @apply tracking-tight;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+
+@layer components {
+  /* One card style for the whole app */
+  .surface {
+    @apply rounded-xl border border-border bg-card text-card-foreground;
+    box-shadow: var(--shadow-card);
+  }
+
+  .section {
+    @apply py-20 md:py-24;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-primary;
+  }
+
+  .num {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Faint dotted grid used behind the hero */
+  .bg-grid {
+    background-image: radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+  }
+}
+
+/* Scan line shown over the MRI preview while analysing */
+@keyframes scan {
+  0%   { top: 0%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  box-shadow: 0 0 18px 4px hsl(var(--primary) / 0.45);
+  animation: scan 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-line { animation: none; top: 50%; }
 }

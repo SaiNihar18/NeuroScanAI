@@ -1,74 +1,126 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { History, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { getHistory, clearHistory } from '@/utils/history';
-import { HistoryItem } from '@/types/prediction';
+import { History, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { getClassInfo } from '@/lib/classes';
+import { HistoryItem } from '@/types/prediction';
+import { clearHistory, removeFromHistory, useHistory } from '@/utils/history';
+import { formatPercent, timeAgo } from '@/utils/format';
+import { SectionHeading } from './Reveal';
 
-export const HistorySection = () => {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+interface Props {
+  onSelect: (item: HistoryItem) => void;
+}
 
-  useEffect(() => {
-    setHistory(getHistory());
-  }, []);
-
-  const handleClearHistory = () => {
-    clearHistory();
-    setHistory([]);
-    toast.success('History cleared');
-  };
-
-  if (history.length === 0) return null;
+export const HistorySection = ({ onSelect }: Props) => {
+  const history = useHistory();
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <History className="h-8 w-8 text-primary" />
-            <h2 className="text-3xl font-bold">Recent Analysis</h2>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearHistory}
-            className="gap-2"
-          >
-            <Trash2 className="h-4 w-4" />
-            Clear History
-          </Button>
+    <section id="history" className="section border-t border-border bg-muted/30">
+      <div className="container">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <SectionHeading
+            align="left"
+            eyebrow="History"
+            title="Recent analyses"
+            description="Stored only in this browser. Select one to view it again."
+          />
+
+          {history.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="self-start sm:self-auto">
+                  <Trash2 /> Clear all
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear all history?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This removes all saved analyses from this browser. It cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      clearHistory();
+                      toast.success('History cleared');
+                    }}
+                  >
+                    Clear history
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {history.map((item, index) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-card rounded-xl overflow-hidden shadow-lg border border-border"
-            >
-              <div className="aspect-square bg-muted">
-                <img
-                  src={item.imageUrl}
-                  alt={`Analysis ${index + 1}`}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-lg mb-1">{item.class}</p>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Confidence: {Math.round(item.confidence * 100)}%
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(item.timestamp).toLocaleDateString()} at{' '}
-                  {new Date(item.timestamp).toLocaleTimeString()}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {history.length === 0 ? (
+          <div className="surface mt-10 flex flex-col items-center px-6 py-14 text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+              <History className="h-5 w-5" aria-hidden />
+            </span>
+            <p className="mt-4 font-medium">Nothing here yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">Your analyzed scans will appear here.</p>
+          </div>
+        ) : (
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {history.map((item) => {
+              const info = getClassInfo(item.predictedClass);
+              return (
+                <li key={item.id} className="group relative">
+                  <button
+                    type="button"
+                    onClick={() => onSelect(item)}
+                    className="surface w-full overflow-hidden text-left transition-shadow hover:shadow-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <div className="aspect-[4/3] bg-black">
+                      <img
+                        src={item.thumbnail}
+                        alt={`Scan analyzed as ${info.label}`}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="h-2 w-2 shrink-0 rounded-full"
+                          style={{ backgroundColor: `hsl(var(${info.colorVar}))` }}
+                          aria-hidden
+                        />
+                        <p className="truncate text-sm font-semibold">{info.label}</p>
+                      </div>
+                      <p className="num mt-1 text-xs text-muted-foreground">
+                        {formatPercent(item.confidence, 0)} · {timeAgo(item.timestamp)}
+                      </p>
+                    </div>
+                  </button>
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="absolute right-2 top-2 h-7 w-7 opacity-0 shadow-card transition-opacity focus-visible:opacity-100 group-hover:opacity-100 max-md:opacity-100"
+                    aria-label={`Delete analysis: ${info.label}`}
+                    onClick={() => removeFromHistory(item.id)}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </section>
   );

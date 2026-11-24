@@ -49,3 +49,6 @@ model/*.tflite
 *.keras
 ml/model/*.h5
 ml/model/*.keras
+
+# Temporary virtual environments
+.venv_temp/

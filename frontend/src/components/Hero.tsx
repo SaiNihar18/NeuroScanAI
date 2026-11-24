@@ -1,109 +1,84 @@
 import { motion } from 'framer-motion';
-import { Brain, Zap, Shield } from 'lucide-react';
+import { ArrowRight, Layers, ShieldCheck, Gauge } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { ProbabilityBars } from './ProbabilityBars';
 
-export const Hero = () => {
-  const scrollToUpload = () => {
-    const uploadSection = document.getElementById('upload-section');
-    uploadSection?.scrollIntoView({ behavior: 'smooth' });
-  };
+// Illustrative values for the preview card only. Not a real prediction.
+const EXAMPLE = { meningioma: 0.94, glioma: 0.03, pituitary: 0.02, notumor: 0.01 };
 
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-accent/10 to-background -z-10" />
-      
-      {/* Floating orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl -z-10"
-      />
-      <motion.div
-        animate={{
-          scale: [1.2, 1, 1.2],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-        className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent/20 rounded-full blur-3xl -z-10"
-      />
+const FACTS = [
+  { icon: Layers, label: '4 classes', detail: 'Glioma, meningioma, pituitary, no tumor' },
+  { icon: Gauge, label: 'Per-class confidence', detail: 'See the full probability breakdown' },
+  { icon: ShieldCheck, label: 'Research use only', detail: 'Not a medical device' },
+];
 
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Brain Tumor Detection
-              <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Using Deep Learning
-              </span>
-            </h1>
-          </motion.div>
+export const Hero = () => (
+  <section className="relative overflow-hidden border-b border-border">
+    <div className="bg-grid pointer-events-none absolute inset-0" aria-hidden />
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto"
-          >
-            Advanced AI-powered classification of brain MRI scans using state-of-the-art Xception CNN architecture
-          </motion.p>
+    <div className="container relative grid items-center gap-12 py-16 md:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+      <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-card">
+          <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
+          Xception transfer-learning model
+        </span>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-16"
-          >
-            <Button
-              size="lg"
-              onClick={scrollToUpload}
-              className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all"
-            >
-              Get Started
-            </Button>
-          </motion.div>
+        <h1 className="mt-6 text-4xl font-semibold leading-[1.1] md:text-5xl lg:text-6xl">
+          Brain MRI classification,
+          <span className="text-primary"> explained with confidence.</span>
+        </h1>
 
-          {/* Feature cards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20"
-          >
-            {[
-              { icon: Brain, title: "AI-Powered", description: "Advanced deep learning model" },
-              { icon: Zap, title: "Instant Results", description: "Get predictions in seconds" },
-              { icon: Shield, title: "Accurate", description: "High confidence predictions" },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="p-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border shadow-lg"
-              >
-                <feature.icon className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground">{feature.description}</p>
-              </motion.div>
-            ))}
-          </motion.div>
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
+          Upload a brain MRI slice and get an AI-assisted classification with a full probability breakdown across four
+          categories, in seconds.
+        </p>
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Button size="lg" asChild>
+            <Link to="/#analyze">
+              Analyze a scan <ArrowRight />
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild>
+            <Link to="/about">About the model</Link>
+          </Button>
         </div>
-      </div>
-    </section>
-  );
-};
+
+        <ul className="mt-12 grid gap-5 sm:grid-cols-3">
+          {FACTS.map(({ icon: Icon, label, detail }) => (
+            <li key={label} className="flex gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                <Icon className="h-[18px] w-[18px]" aria-hidden />
+              </span>
+              <div>
+                <p className="text-sm font-semibold">{label}</p>
+                <p className="mt-0.5 text-xs leading-snug text-muted-foreground">{detail}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, delay: 0.1 }}
+        className="relative mx-auto w-full max-w-md"
+        aria-hidden
+      >
+        <div className="surface p-6 shadow-elevated">
+          <div className="flex items-center justify-between">
+            <p className="eyebrow">Example output</p>
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">Illustrative</span>
+          </div>
+          <p className="mt-3 text-2xl font-semibold">Meningioma</p>
+          <p className="num text-sm text-muted-foreground">94.0% confidence</p>
+          <div className="mt-6">
+            <ProbabilityBars probabilities={EXAMPLE} highlight="meningioma" decorative />
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  </section>
+);

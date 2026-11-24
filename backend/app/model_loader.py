@@ -31,9 +31,6 @@ if TF_AVAILABLE and os.path.exists(MODEL_PATH):
     model = tf.keras.models.load_model(MODEL_PATH, compile=False)
     load_time = time.time() - load_start
     
-    print("⚙️ Compiling model for inference...")
-    model.compile(optimizer='adamax', loss='categorical_crossentropy', metrics=['accuracy'])
-    
     # VERIFICATION
     total_params = model.count_params()
     print(f"✅ Model loaded in {load_time:.1f}s!")
@@ -51,5 +48,24 @@ with open(CLASS_INDEX_PATH, "r") as f:
 # Reverse mapping: index → class label
 index_to_class = {v: k for k, v in class_indices.items()}
 
-# Class names in order
-CLASS_NAMES = ['glioma', 'meningioma', 'notumor', 'pituitary']
+# Class names in order of the model's output indices
+CLASS_NAMES = [index_to_class[i] for i in sorted(index_to_class)]
+
+_warmed_up = False
+
+
+def warm_up() -> None:
+    """Run one dummy prediction so TensorFlow builds its graph before the first user request."""
+    global _warmed_up
+    if model is None or _warmed_up:
+        return
+    import numpy as np
+
+    start = time.time()
+    model.predict(np.zeros((1, 299, 299, 3), dtype="float32"), verbose=0)
+    _warmed_up = True
+    print(f"🔥 Model warmed up in {time.time() - start:.1f}s")
+
+
+def model_status() -> dict:
+    return {"model_loaded": model is not None, "warmed_up": _warmed_up}

@@ -1,4 +1,4 @@
-# NeuroAI - Brain Tumor Detection
+# NeuroScan AI - Brain Tumor Detection
 
 A modern, fully responsive web application for brain tumor classification using deep learning. Built with React, TypeScript, and Tailwind CSS.
 
@@ -48,7 +48,7 @@ cp .env.example .env
 
 4. Update the API endpoint in `.env`:
 ```env
-VITE_API_BASE_URL=http://localhost:8000
+VITE_API_BASE=http://localhost:8000
 ```
 
 ### Running the Application
@@ -84,7 +84,7 @@ The frontend expects a FastAPI backend with the following endpoint:
 
 Edit the `.env` file to point to your FastAPI backend:
 ```env
-VITE_API_BASE_URL=https://your-backend-url.com
+VITE_API_BASE=https://your-backend-url.com
 ```
 
 ## 📁 Project Structure
@@ -94,7 +94,7 @@ src/
 ├── components/          # React components
 │   ├── Hero.tsx        # Landing hero section
 │   ├── Navbar.tsx      # Navigation bar
-│   ├── UploadSection.tsx   # Image upload & analysis
+│   ├── AnalysisWorkspace.tsx   # Upload, analysis & results
 │   ├── ResultCard.tsx  # Results display
 │   ├── HistorySection.tsx  # Recent analyses
 │   ├── Footer.tsx      # Footer component
